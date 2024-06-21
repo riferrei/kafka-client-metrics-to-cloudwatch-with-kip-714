@@ -1,8 +1,8 @@
 # Maven build
 target/classes
 target/generated-sources
-target/maven-archiver/*.*
-target/maven-status/*.*
+target/maven-archiver/*
+target/maven-status/*
 target/test-classes
 
 # Compiled class file
