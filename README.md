@@ -28,16 +28,16 @@ Now create a topic to play with:
 kafka-topics.sh --bootstrap-server localhost:9092 --create --topic load-test --partitions 1 --replication-factor 1
 ```
 
-Load a few records into the topic. Okay, I said a few but let's make it worth. With the command below you can load 100K records and trigger the publishing of the producer metrics.
+Load a few records into the topic. Okay, I said a few but let's make it worth. With the command below you can load 50K records and trigger the publishing of the producer metrics.
 
 ```bash
-kafka-producer-perf-test.sh --producer-props bootstrap.servers=localhost:9092 --throughput 1000 --num-records 100000 --record-size 1024 --topic load-test --print-metrics
+kafka-producer-perf-test.sh --producer-props bootstrap.servers=localhost:9092 --throughput 1000 --num-records 50000 --record-size 1024 --topic load-test --print-metrics
 ```
 
 Finally, you must consume these records to trigger the consumer metrics. Use the command below for this:
 
 ```bash
-kafka-consumer-perf-test.sh --bootstrap-server localhost:9092 --messages 100000 --topic load-test
+kafka-consumer-perf-test.sh --bootstrap-server localhost:9092 --messages 50000 --topic load-test
 ```
 
 💡 Depending of the version of Apache Kafka you're using, you may see some warnings after executing this command. You can safely ignore them.

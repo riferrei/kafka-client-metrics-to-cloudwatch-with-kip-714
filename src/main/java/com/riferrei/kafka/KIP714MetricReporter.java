@@ -10,9 +10,9 @@ import org.apache.kafka.server.telemetry.ClientTelemetryReceiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CustomMetricReporter implements MetricsReporter, ClientTelemetry {
+public class KIP714MetricReporter implements MetricsReporter, ClientTelemetry {
 
-    private static final Logger log = LoggerFactory.getLogger(CustomMetricReporter.class);
+    private static final Logger log = LoggerFactory.getLogger(KIP714MetricReporter.class);
 
     @Override
     public void init(List<KafkaMetric> metrics) {

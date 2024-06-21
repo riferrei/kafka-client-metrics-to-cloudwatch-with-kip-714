@@ -38,10 +38,10 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
-      KAFKA_METRIC_REPORTERS: 'com.riferrei.kafka.CustomMetricReporter'
+      KAFKA_METRIC_REPORTERS: 'com.riferrei.kafka.KIP714MetricReporter'
       OTLP_EXPORTER: 'http://collector:4318'
     volumes:
-      - ./target/kip-714-exporter-1.0.jar:/opt/kafka/libs/kip-714-exporter-1.0.jar
+      - ./target/kip-714-metric-exporter-1.0.jar:/opt/kafka/libs/kip-714-metric-exporter-1.0.jar
     healthcheck:
       test: echo srvr | nc kafka 9092 || exit 1
       interval: 5s

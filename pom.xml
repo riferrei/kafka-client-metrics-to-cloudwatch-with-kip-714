@@ -7,7 +7,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
     <groupId>com.riferrei.kafka.developers</groupId>
-    <artifactId>kip-714-exporter</artifactId>
+    <artifactId>kip-714-metric-exporter</artifactId>
     <version>1.0</version>
 
 	<properties>
