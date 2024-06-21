@@ -1,0 +1,26 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 5s
+
+exporters:
+  awsemf:
+    region: 'us-east-1'
+    namespace: 'kafka-kip-714'
+    log_stream_name: 'kafka-kip-714'
+    log_group_name: '/metrics/kip-714'
+    log_retention: 7
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [awsemf]

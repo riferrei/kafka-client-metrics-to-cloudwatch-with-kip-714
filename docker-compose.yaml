@@ -1,9 +1,25 @@
 services:
 
+  collector:
+    image: public.ecr.aws/aws-observability/aws-otel-collector:latest
+    container_name: collector
+    hostname: collector
+    command: ["--config=/etc/otel-collector.yaml"]
+    environment:
+      - AWS_PROFILE=default
+    volumes:
+      - ./otel-collector.yaml:/etc/otel-collector.yaml
+      - ~/.aws:/home/aoc/.aws
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+
   kafka:
+    depends_on:
+      - collector
     image: apache/kafka:3.7.0
-    hostname: kafka
     container_name: kafka
+    hostname: kafka
     ports:
       - "9092:9092"
     environment:
@@ -23,7 +39,7 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
       KAFKA_METRIC_REPORTERS: 'com.riferrei.kafka.CustomMetricReporter'
-      OTLP_EXPORTER: 'http://localhost:5555'
+      OTLP_EXPORTER: 'http://collector:4318'
     volumes:
       - ./target/kip-714-exporter-1.0.jar:/opt/kafka/libs/kip-714-exporter-1.0.jar
     healthcheck:
