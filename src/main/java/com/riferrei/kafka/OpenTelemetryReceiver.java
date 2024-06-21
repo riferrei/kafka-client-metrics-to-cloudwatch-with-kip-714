@@ -16,16 +16,31 @@ import org.slf4j.LoggerFactory;
 
 public class OpenTelemetryReceiver implements ClientTelemetryReceiver {
 
-    private static final Logger log = LoggerFactory.getLogger(OpenTelemetryReceiver.class);
+    private final Logger log = LoggerFactory.getLogger(OpenTelemetryReceiver.class);
 
-    private final HttpClient client = HttpClient.newBuilder()
-        .version(HttpClient.Version.HTTP_1_1)
-        .connectTimeout(Duration.ofSeconds(5))
-        .build();
+    private String otlpMetricsEndpoint = "http://localhost:4318/v1/metrics";
+    private int otlpMetricsTimeout = 10000;
+    private HttpClient client;
+
+
+    public OpenTelemetryReceiver() {
+        var otlpMetricsEndpointEnv = System.getenv("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT");
+        if (otlpMetricsEndpointEnv != null && !otlpMetricsEndpointEnv.isEmpty()) {
+            otlpMetricsEndpoint = otlpMetricsEndpointEnv;
+        }
+        var otlpMetricsTimeoutEnv = System.getenv("OTEL_EXPORTER_OTLP_METRICS_TIMEOUT");
+        if (otlpMetricsTimeoutEnv != null && !otlpMetricsTimeoutEnv.isEmpty()) {
+            otlpMetricsTimeout = Integer.parseInt(otlpMetricsTimeoutEnv);
+        }
+        client = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_1_1)
+            .connectTimeout(Duration.ofMillis(otlpMetricsTimeout))
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .build();
+    }
 
     @Override
     public void exportMetrics(AuthorizableRequestContext context, ClientTelemetryPayload payload) {
-        String otlpExporter = System.getenv("OTLP_EXPORTER");
         ByteBuffer byteBuffer = payload.data();
         byte[] bytes;
 
@@ -37,7 +52,7 @@ public class OpenTelemetryReceiver implements ClientTelemetryReceiver {
         }
 
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(otlpExporter + "/v1/metrics"))
+            .uri(URI.create(otlpMetricsEndpoint))
             .header("Content-Type", "application/x-protobuf")
             .POST(HttpRequest.BodyPublishers.ofByteArray(bytes))
             .build();
@@ -45,12 +60,12 @@ public class OpenTelemetryReceiver implements ClientTelemetryReceiver {
         try {
             client.sendAsync(request, BodyHandlers.ofString())
                 .thenApply(response -> {
-                    log.info("Response status code: " + response.statusCode());
+                    log.info("OTLP metrics endpoint response status code: " + response.statusCode());
                     return response;
                 })
                 .thenApply(HttpResponse::body);
         } catch (Exception ex) {
-            log.error("Error sending request to OTLP exporter", ex);
+            log.error("Error sending request to the OTLP metrics endpoint", ex);
         }
     }
     
