@@ -1,8 +1,6 @@
 receivers:
   otlp:
     protocols:
-      grpc:
-        endpoint: 0.0.0.0:4317
       http:
         endpoint: 0.0.0.0:4318
 
@@ -18,7 +16,14 @@ exporters:
     log_group_name: '/metrics/kip-714'
     log_retention: 7
 
+extensions:
+  health_check:
+    check_collector_pipeline:
+      enabled: true
+      interval: 1m
+
 service:
+  extensions: [health_check]
   pipelines:
     metrics:
       receivers: [otlp]
