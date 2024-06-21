@@ -37,7 +37,7 @@ kafka-producer-perf-test.sh --producer-props bootstrap.servers=localhost:9092 --
 Finally, you must consume these records to trigger the consumer metrics. Use the command below for this:
 
 ```bash
-kafka-consumer-perf-test.sh --bootstrap-server localhost:9092 --messages 50000 --topic load-test
+kafka-consumer-perf-test.sh --bootstrap-server localhost:9092 --messages 50000 --topic load-test --print-metrics
 ```
 
 💡 Depending of the version of Apache Kafka you're using, you may see some warnings after executing this command. You can safely ignore them.
