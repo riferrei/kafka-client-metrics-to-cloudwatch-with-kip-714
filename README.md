@@ -4,7 +4,7 @@ This project contains an example that shows how to push metrics from your Apache
 
 ## Getting started
 
-Everything in this project is configured for you just experience the KIP-714 with little hassle. If you want to understand in details what is going on behind the scenes, this blog post provides you this. To get started with the project, just execute the Docker Compose file. It will execute a Kafka broker, it will enable client metrics on it, create a topic named `load-test`, and execute an OpenTelemetry collector. The OpenTelemetry collector will use your stored AWS credentials to connect with Amazon CloudWatch. If you have not configured your credentials using the AWS CLI, do it before proceeding.
+Everything in this project is configured for you just experience the KIP-714 with little hassle. If you want to understand in details what is going on behind the scenes, this blog post provides you this. To get started with the project, just execute the Docker Compose file. It will execute a Kafka broker and it will perform the required setup on it. It will also execute an OpenTelemetry collector. The OpenTelemetry collector will use your stored AWS credentials to connect with Amazon CloudWatch. If you have not configured your credentials using the AWS CLI, do it before proceeding.
 
 ```bash
 docker compose up -d
