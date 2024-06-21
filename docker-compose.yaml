@@ -47,3 +47,24 @@ services:
       test: echo srvr | nc kafka 9092 || exit 1
       interval: 5s
       retries: 10
+
+  setup-kafka:
+    depends_on:
+      kafka:
+        condition: service_healthy
+    image: apache/kafka:3.7.0
+    container_name: setup-kafka
+    hostname: setup-kafka
+    restart: "no"
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      "
+      echo 'Enabling client metrics'
+      /opt/kafka/bin/kafka-client-metrics.sh --bootstrap-server kafka:29092 \\
+          --metrics org.apache.kafka.producer.,org.apache.kafka.consumer. \\
+          --alter --generate-name --interval 1000
+
+      echo 'Creating the topic'
+      /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:29092 --create \\
+         --topic load-test --partitions 1 --replication-factor 1
+      "

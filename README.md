@@ -4,37 +4,21 @@ This project contains an example that shows how to push metrics from your Apache
 
 ## Getting started
 
-Everything in this project is already packed for you just experience the KIP-714 without much hassle. If you want to understand in details what is going on behind the scenes, this blog post provides you this. To get started with the project, just execute the Docker Compose file to execute a Kafka broker and a OpenTelemetry collector.
+Everything in this project is configured for you just experience the KIP-714 with little hassle. If you want to understand in details what is going on behind the scenes, this blog post provides you this. To get started with the project, just execute the Docker Compose file. It will execute a Kafka broker, it will enable client metrics on it, create a topic named `load-test`, and execute an OpenTelemetry collector. The OpenTelemetry collector will use your stored AWS credentials to connect with Amazon CloudWatch. If you have not configured your credentials using the AWS CLI, do it before proceeding.
 
 ```bash
 docker compose up -d
 ```
 
-The current implementation will use your stored AWS credentials to connect with Amazon CloudWatch. If you have not configured your credentials using the AWS CLI, go ahead and do it. You may need to restart the containers for the change to take effect.
-
 💡 For the next steps, you must have a distribution of Apache Kafka installed in your machine.
 
-The next step is enable client metrics collection in your Kafka broker. Without this, the support for the KIP-714 won't be offcially enabled. Execute the following command for this:
-
-```bash
-kafka-client-metrics.sh --bootstrap-server localhost:9092 --alter --generate-name \
-  --metrics org.apache.kafka.producer.,org.apache.kafka.consumer. \
-  --interval 1000
-```
-
-Now create a topic to play with:
-
-```bash
-kafka-topics.sh --bootstrap-server localhost:9092 --create --topic load-test --partitions 1 --replication-factor 1
-```
-
-Load a few records into the topic. Okay, I said a few but let's make it worth. With the command below you can load 50K records and trigger the publishing of the producer metrics.
+Load a few records into the `load-test` topic. The command below loads `50K` records to trigger the producer metrics.
 
 ```bash
 kafka-producer-perf-test.sh --producer-props bootstrap.servers=localhost:9092 --throughput 1000 --num-records 50000 --record-size 1024 --topic load-test --print-metrics
 ```
 
-Finally, you must consume these records to trigger the consumer metrics. Use the command below for this:
+You must also consume these records to trigger the consumer metrics. Use the command below for this.
 
 ```bash
 kafka-consumer-perf-test.sh --bootstrap-server localhost:9092 --messages 50000 --topic load-test --print-metrics
@@ -44,9 +28,36 @@ kafka-consumer-perf-test.sh --bootstrap-server localhost:9092 --messages 50000 -
 
 ## Viewing the metrics at Amazon CloudWatch
 
-Go to the AWS console and access Amazon CloudWatch. You should see a new namespace called `kafka-kip-714` with a bunch of metrics for you to play with.
+Go to the AWS console and access Amazon CloudWatch. You should see a new namespace called `kafka-kip-714` with a lots of metrics for you to play with.
 
-![Apache Kafka Client Metrics](/images/cloudwatch.png)
+![Multiple metric groups](/images/cloudwatch.png)
+
+If you want to visualize the record count you loaded into `load-test` topic using gauges, use the graph source below with Amazon CloudWatch:
+
+```json
+{
+    "metrics": [
+        [ "kafka-kip-714", "org.apache.kafka.producer.topic.record.send.total", "topic", "load-test" ],
+        [ ".", "org.apache.kafka.consumer.fetch.manager.records.consumed.total", ".", "." ]
+    ],
+    "view": "gauge",
+    "stacked": false,
+    "region": "us-east-1",
+    "yAxis": {
+        "left": {
+            "min": 0,
+            "max": 100000
+        }
+    },
+    "stat": "Sum",
+    "period": 300,
+    "liveData": true
+}
+```
+
+You should see the following result:
+
+![Sample Kafka metrics](/images/metrics.png)
 
 # License
 
