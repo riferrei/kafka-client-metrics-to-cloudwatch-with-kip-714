@@ -1,5 +1,7 @@
 package com.riferrei.kafka;
 
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -14,34 +16,51 @@ public class KIP714MetricReporter implements MetricsReporter, ClientTelemetry {
 
     private static final Logger log = LoggerFactory.getLogger(KIP714MetricReporter.class);
 
+    private String otlpMetricsEndpoint = "http://localhost:4318/v1/metrics";
+    private int otlpMetricsConnectTimeout = 5000;
+    private HttpClient httpClient;
+
     @Override
     public void init(List<KafkaMetric> metrics) {
-        log.info("Initializing the metrics");
+        log.debug("Initializing the KIP-714 metric reporter: " + metrics);
     }
 
     @Override
     public void configure(Map<String, ?> configs) {
-        log.info("Configuring the reporter");
+        var otlpMetricsEndpointEnv = System.getenv("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT");
+        if (otlpMetricsEndpointEnv != null && !otlpMetricsEndpointEnv.isEmpty()) {
+            otlpMetricsEndpoint = otlpMetricsEndpointEnv;
+        }
+        var otlpMetricsConnectTimeoutEnv = System.getenv("OTEL_EXPORTER_OTLP_METRICS_CONNECT_TIMEOUT");
+        if (otlpMetricsConnectTimeoutEnv != null && !otlpMetricsConnectTimeoutEnv.isEmpty()) {
+            otlpMetricsConnectTimeout = Integer.parseInt(otlpMetricsConnectTimeoutEnv);
+        }
+        httpClient = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_2)
+            .connectTimeout(Duration.ofMillis(otlpMetricsConnectTimeout))
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .build();
     }
 
     @Override
     public void metricChange(KafkaMetric metric) {
-        log.info("Handling the change in a metric");
+        log.info("Changing the metric: " + metric.metricName());
     }
 
     @Override
     public void metricRemoval(KafkaMetric metric) {
-        log.info("Handling the removal of a metric");
+        log.info("Removing the metric: " + metric.metricName());
     }
 
     @Override
     public void close() {
-        log.info("Closing the reporter");
+        log.debug("Closing the KIP-714 metric reporter");
+        httpClient.close();
     }
 
     @Override
     public ClientTelemetryReceiver clientReceiver() {
-        return new OpenTelemetryReceiver();
+        return new OpenTelemetryReceiver(otlpMetricsEndpoint, httpClient);
     }
 
 }

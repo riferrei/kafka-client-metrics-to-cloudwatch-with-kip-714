@@ -40,11 +40,10 @@ services:
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
       KAFKA_METRIC_REPORTERS: 'com.riferrei.kafka.KIP714MetricReporter'
       OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: 'http://collector:4318/v1/metrics'
-      OTEL_EXPORTER_OTLP_METRICS_TIMEOUT: 5000
     volumes:
       - ./target/kip-714-metric-exporter-1.0.jar:/opt/kafka/libs/kip-714-metric-exporter-1.0.jar
     healthcheck:
-      test: echo srvr | nc kafka 9092 || exit 1
+      test: nc -z localhost 9092 || exit  -1
       interval: 5s
       retries: 10
 
