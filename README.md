@@ -4,7 +4,7 @@ This project contains an example that shows how to push metrics from your Apache
 
 ## Getting started
 
-Everything in this project is configured for you just experience the KIP-714 with little hassle. If you want to understand in details what is going on behind the scenes, this blog post provides you this. To get started with the project, just execute the Docker Compose file. It will execute a Kafka broker and it will perform the required setup on it. It will also execute an OpenTelemetry collector. The OpenTelemetry collector will use your stored AWS credentials to connect with Amazon CloudWatch. If you have not configured your credentials using the AWS CLI, do it before proceeding.
+Everything in this project is configured for you just experience the KIP-714 with little hassle. If you want to understand in details what is going on behind the scenes, this blog post provides you this. To get started, just execute the Docker Compose file. It will execute a Kafka broker and it will perform the required setup on it. It will also execute an OpenTelemetry collector. The OpenTelemetry collector will use your stored AWS credentials to connect with Amazon CloudWatch. If you have not configured your credentials using the AWS CLI, do it before proceeding.
 
 ```bash
 docker compose up -d
@@ -12,13 +12,13 @@ docker compose up -d
 
 💡 For the next steps, you must have a distribution of Apache Kafka installed in your machine.
 
-Load a few records into the `load-test` topic. The command below loads `50K` records to trigger the producer metrics.
+Load a few records into the `load-test` topic. The command below loads `50K` records to trigger the producer metrics. Each record with a payload size of 1KB, sending 1K records every second.
 
 ```bash
 kafka-producer-perf-test.sh --producer-props bootstrap.servers=localhost:9092 --throughput 1000 --num-records 50000 --record-size 1024 --topic load-test --print-metrics
 ```
 
-You must also consume these records to trigger the consumer metrics. Use the command below for this.
+You must also consume these records to trigger the consumer metrics. The command below loads the `50K` records from the `load-test` topic.
 
 ```bash
 kafka-consumer-perf-test.sh --bootstrap-server localhost:9092 --messages 50000 --topic load-test --print-metrics
@@ -38,7 +38,7 @@ If you want to visualize the record count you loaded into `load-test` topic usin
 {
     "metrics": [
         [ "kafka-kip-714", "org.apache.kafka.producer.topic.record.send.total", "topic", "load-test" ],
-        [ ".", "org.apache.kafka.consumer.fetch.manager.records.consumed.total", ".", "." ]
+        [ "kafka-kip-714", "org.apache.kafka.consumer.fetch.manager.records.consumed.total", "topic", "load-test" ]
     ],
     "view": "gauge",
     "stacked": false,
@@ -46,18 +46,21 @@ If you want to visualize the record count you loaded into `load-test` topic usin
     "yAxis": {
         "left": {
             "min": 0,
-            "max": 100000
+            "max": 50000
         }
     },
     "stat": "Sum",
     "period": 300,
-    "liveData": true
+    "liveData": true,
+    "setPeriodToTimeRange": false,
+    "sparkline": true,
+    "trend": true
 }
 ```
 
 You should see the following result:
 
-![Sample Kafka metrics](/images/metrics.png)
+![Sample Kafka metrics](/images/client-metrics.png)
 
 # License
 
