@@ -63,9 +63,14 @@ public class OpenTelemetryReceiver implements ClientTelemetryReceiver {
                     log.info("OTLP metrics endpoint response status code: " + response.statusCode());
                     return response;
                 })
-                .thenApply(HttpResponse::body);
+                .thenApply(HttpResponse::body)
+                .exceptionally(ex -> {
+                    log.error("Error invoking the OTLP metrics endpoint", ex);
+                    return null;
+                })
+                .join();
         } catch (Exception ex) {
-            log.error("Error sending request to the OTLP metrics endpoint", ex);
+            log.error("Unhandled exception", ex);
         }
     }
     
