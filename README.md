@@ -32,7 +32,7 @@ Go to the AWS console and access Amazon CloudWatch. You should see a new namespa
 
 ![Multiple metric groups](/images/cloudwatch.png)
 
-If you want to visualize the records loaded and consumed to/from the `load-test` topic using gauges, use the graph source below on Amazon CloudWatch:
+If you want to visualize the load from the `load-test` topic using gauges, use the graph source below on Amazon CloudWatch:
 
 ```json
 {
