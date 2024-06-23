@@ -28,11 +28,11 @@ kafka-consumer-perf-test.sh --bootstrap-server localhost:9092 --messages 50000 -
 
 ## Viewing the metrics at Amazon CloudWatch
 
-Go to the AWS console and access Amazon CloudWatch. You should see a new namespace called `kafka-kip-714` with a lots of metrics for you to play with.
+Go to the AWS console and access Amazon CloudWatch. You should see a new namespace called `kafka-kip-714` with a load of metrics for you to play with.
 
 ![Multiple metric groups](/images/cloudwatch.png)
 
-If you want to visualize the record count you loaded into `load-test` topic using gauges, use the graph source below with Amazon CloudWatch:
+If you want to visualize the records loaded and consumed to/from the `load-test` topic using gauges, use the graph source below on Amazon CloudWatch:
 
 ```json
 {
