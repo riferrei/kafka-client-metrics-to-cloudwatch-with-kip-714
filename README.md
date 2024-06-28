@@ -4,7 +4,11 @@ This project contains an example that shows how to push metrics from your Apache
 
 ## Getting started
 
-Everything in this project is configured for you just experience the KIP-714 with little hassle. If you want to understand in details what is going on behind the scenes, [this blog post](https://community.aws/content/2i3i0osdRihttgQ8AZii6F0Bv4F/kip-714-keep-your-kafka-clusters-close-and-your-kafka-clients-closer) provides you this. To get started, just execute the Docker Compose file. It will execute a Kafka broker and it will perform the required setup on it. It will also execute an OpenTelemetry collector. The OpenTelemetry collector will use your stored AWS credentials to connect with Amazon CloudWatch. If you have not configured your credentials using the AWS CLI, do it before proceeding.
+Everything in this project is configured for you just experience the KIP-714 with little hassle. If you want to understand what is going on behind the scenes, the blog post below explain everything in great details.
+
+[![KIP-714: Keep your Kafka Clusters Close, and your Kafka Clients Closer](/images/blog-post.png 'KIP-714: Keep your Kafka Clusters Close, and your Kafka Clients Closer')](https://community.aws/content/2i3i0osdRihttgQ8AZii6F0Bv4F/kip-714-keep-your-kafka-clusters-close-and-your-kafka-clients-closer)
+
+To get started, just execute the Docker Compose file. It will execute a Kafka broker and it will perform the required setup on it. It will also execute an OpenTelemetry collector. The OpenTelemetry collector will use your stored AWS credentials to connect with Amazon CloudWatch. If you have not configured your credentials using the AWS CLI, do it before proceeding.
 
 ```bash
 docker compose up -d
