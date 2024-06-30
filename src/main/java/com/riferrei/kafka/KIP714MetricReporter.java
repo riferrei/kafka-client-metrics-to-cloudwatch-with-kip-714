@@ -44,12 +44,12 @@ public class KIP714MetricReporter implements MetricsReporter, ClientTelemetry {
 
     @Override
     public void metricChange(KafkaMetric metric) {
-        log.info("Changing the metric: " + metric.metricName());
+        log.debug("Changing the metric: " + metric.metricName());
     }
 
     @Override
     public void metricRemoval(KafkaMetric metric) {
-        log.info("Removing the metric: " + metric.metricName());
+        log.debug("Removing the metric: " + metric.metricName());
     }
 
     @Override
